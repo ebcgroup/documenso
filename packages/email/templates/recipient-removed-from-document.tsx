@@ -1,8 +1,6 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
 import TemplateDocumentImage from '../template-components/template-document-image';
@@ -15,10 +13,7 @@ export const RecipientRemovedFromDocumentTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentCancelEmailTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`${inviterName} has removed you from the document ${documentName}.`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

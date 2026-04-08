@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
@@ -21,8 +21,6 @@ export const TeamDeleteEmailTemplate = ({
 }: TeamDeleteEmailProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`A team you were a part of has been deleted`;
 
   const title = msg`A team you were a part of has been deleted`;
 

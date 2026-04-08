@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateConfirmationEmailProps } from '../template-components/template-confirmation-email';
 import { TemplateConfirmationEmail } from '../template-components/template-confirmation-email';
@@ -11,10 +9,7 @@ export const ConfirmEmailTemplate = ({
   confirmationLink,
   assetBaseUrl = 'http://localhost:3002',
 }: TemplateConfirmationEmailProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`Please confirm your email address`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

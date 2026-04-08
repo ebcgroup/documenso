@@ -1,11 +1,10 @@
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
-import { Body, Button, Container, Head, Html, Img, Preview, Section, Text } from '../components';
+import { Body, Button, Container, Head, Html, Img, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import TemplateDocumentImage from '../template-components/template-document-image';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -29,8 +28,6 @@ export const DocumentCreatedFromDirectTemplateEmailTemplate = ({
   const branding = useBranding();
 
   const action = _(RECIPIENT_ROLES_DESCRIPTION[recipientRole].actioned).toLowerCase();
-
-  const previewText = msg`Document created from direct template`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

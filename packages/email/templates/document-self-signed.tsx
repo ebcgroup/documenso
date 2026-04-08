@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import type { TemplateDocumentSelfSignedProps } from '../template-components/template-document-self-signed';
 import { TemplateDocumentSelfSigned } from '../template-components/template-document-self-signed';
@@ -13,10 +11,7 @@ export const DocumentSelfSignedEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentSelfSignedTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`Completed Document`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateAccessAuth2FA } from '../template-components/template-access-auth-2fa';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -23,11 +21,8 @@ export const AccessAuth2FAEmailTemplate = ({
   expiresInMinutes,
   assetBaseUrl = 'http://localhost:3002',
 }: AccessAuth2FAEmailTemplateProps) => {
-  const { _ } = useLingui();
 
   const branding = useBranding();
-
-  const previewText = msg`Your verification code is ${code}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

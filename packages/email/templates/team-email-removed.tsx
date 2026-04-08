@@ -1,10 +1,8 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
@@ -24,10 +22,7 @@ export const TeamEmailRemovedTemplate = ({
   teamName = 'Team Name',
   teamUrl = 'demo',
 }: TeamEmailRemovedTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`Team email removed for ${teamName} on Documenso`;
 
   return (
     <Html>

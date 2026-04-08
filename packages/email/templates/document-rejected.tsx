@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateDocumentRejected } from '../template-components/template-document-rejected';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -21,10 +19,7 @@ export function DocumentRejectedEmail({
   rejectionReason,
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentRejectedEmailProps) {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = _(msg`${recipientName} has rejected the document '${documentName}'`);
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

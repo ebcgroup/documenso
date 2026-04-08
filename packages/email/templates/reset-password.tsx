@@ -1,8 +1,6 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Link, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import type { TemplateResetPasswordProps } from '../template-components/template-reset-password';
@@ -15,10 +13,7 @@ export const ResetPasswordTemplate = ({
   userEmail = 'lucas@documenso.com',
   assetBaseUrl = 'http://localhost:3002',
 }: ResetPasswordTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`Password Reset Successful`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Hr, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateFooter } from '../template-components/template-footer';
 import type { TemplateRecipientExpiredProps } from '../template-components/template-recipient-expired';
@@ -16,10 +14,7 @@ export const RecipientExpiredTemplate = ({
   documentLink = 'https://documenso.com',
   assetBaseUrl = 'http://localhost:3002',
 }: RecipientExpiredEmailTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`The signing window for "${recipientName}" on document "${documentName}" has expired.`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

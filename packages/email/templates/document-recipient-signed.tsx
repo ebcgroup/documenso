@@ -1,7 +1,5 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Preview, Section } from '../components';
+import { Body, Container, Head, Html, Img, Section } from '../components';
 import { useBranding } from '../providers/branding';
 import { TemplateDocumentRecipientSigned } from '../template-components/template-document-recipient-signed';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -19,12 +17,9 @@ export const DocumentRecipientSignedEmailTemplate = ({
   recipientEmail = 'lucas@documenso.com',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentRecipientSignedEmailTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
 
   const recipientReference = recipientName || recipientEmail;
-
-  const previewText = msg`${recipientReference} has signed ${documentName}`;
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

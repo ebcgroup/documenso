@@ -1,5 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import {
@@ -32,7 +30,6 @@ export const OrganisationInviteEmailTemplate = ({
   organisationName = 'Organisation Name',
   token = '',
 }: OrganisationInviteEmailProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
 
   return (

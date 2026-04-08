@@ -1,5 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import {
@@ -10,7 +8,6 @@ import {
   Hr,
   Html,
   Img,
-  Preview,
   Section,
   Text,
 } from '../components';
@@ -31,13 +28,7 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
   organisationName = '<ORGANISATION_NAME>',
   assetBaseUrl = 'http://localhost:3002',
 }: OrganisationAccountLinkConfirmationTemplateProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText =
-    type === 'create'
-      ? msg`A request has been made to create an account for you`
-      : msg`A request has been made to link your Documenso account`;
 
   return (
     <Html>

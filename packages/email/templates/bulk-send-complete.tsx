@@ -1,7 +1,6 @@
 import { Trans, msg } from '@lingui/macro';
-import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Preview, Section, Text } from '../components';
+import { Body, Container, Head, Html, Section, Text } from '../components';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export interface BulkSendCompleteEmailProps {
@@ -22,7 +21,6 @@ export const BulkSendCompleteEmail = ({
   failedCount,
   errors,
 }: BulkSendCompleteEmailProps) => {
-  const { _ } = useLingui();
 
   return (
     <Html>

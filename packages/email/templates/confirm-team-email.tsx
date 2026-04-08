@@ -1,5 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import { formatTeamUrl } from '@documenso/lib/utils/teams';
@@ -13,8 +11,7 @@ import {
   Html,
   Img,
   Link,
-  Preview,
-  Section,
+    Section,
   Text,
 } from '../components';
 import { useBranding } from '../providers/branding';
@@ -36,10 +33,7 @@ export const ConfirmTeamEmailTemplate = ({
   teamUrl = 'demo',
   token = '',
 }: ConfirmTeamEmailProps) => {
-  const { _ } = useLingui();
   const branding = useBranding();
-
-  const previewText = msg`Accept team email request for ${teamName} on Documenso`;
 
   return (
     <Html>

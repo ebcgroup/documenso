@@ -21,17 +21,44 @@ echo "Building docker image for monorepo at $MONOREPO_ROOT"
 echo "App version: $APP_VERSION"
 echo "Git SHA: $GIT_SHA"
 
+BUILD_ARGS=(
+    -f "$SCRIPT_DIR/Dockerfile"
+    --platform=$PLATFORM
+    --progress=plain
+    --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}"
+    --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}"
+)
+
+if [ ! -z "$DOCKER_REPOSITORY" ]; then
+    echo "Using custom repository: $DOCKER_REPOSITORY"
+
+    BUILD_ARGS+=(
+        -t "$DOCKER_REPOSITORY:latest"
+        -t "$DOCKER_REPOSITORY:$GIT_SHA"
+    )
+
+    if [ ! -z "$APP_VERSION" ] && [ "$APP_VERSION" != "undefined" ]; then
+        BUILD_ARGS+=(-t "$DOCKER_REPOSITORY:$APP_VERSION")
+    fi
+else
+    echo "Using default repositories: dockerhub and ghcr.io"
+
+    BUILD_ARGS+=(
+        -t "documenso/documenso:latest"
+        -t "documenso/documenso:$GIT_SHA"
+        -t "ghcr.io/documenso/documenso:latest"
+        -t "ghcr.io/documenso/documenso:$GIT_SHA"
+    )
+
+    if [ ! -z "$APP_VERSION" ] && [ "$APP_VERSION" != "undefined" ]; then
+        BUILD_ARGS+=(
+            -t "documenso/documenso:$APP_VERSION"
+            -t "ghcr.io/documenso/documenso:$APP_VERSION"
+        )
+    fi
+fi
+
 docker buildx build \
-    -f "$SCRIPT_DIR/Dockerfile" \
-    --platform=$PLATFORM \
-    --progress=plain \
-    --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}" \
-    --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}" \
-    -t "documenso/documenso:latest" \
-    -t "documenso/documenso:$GIT_SHA" \
-    -t "documenso/documenso:$APP_VERSION" \
-    -t "ghcr.io/documenso/documenso:latest" \
-    -t "ghcr.io/documenso/documenso:$GIT_SHA" \
-    -t "ghcr.io/documenso/documenso:$APP_VERSION" \
+    "${BUILD_ARGS[@]}" \
     --push \
     "$MONOREPO_ROOT"

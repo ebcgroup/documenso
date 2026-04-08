@@ -5,12 +5,14 @@ import { Trans } from '@lingui/react/macro';
 import {
   Body,
   Button,
+  Column,
   Container,
   Head,
   Hr,
   Html,
   Img,
   Preview,
+  Row,
   Section,
   Text,
 } from '../components';
@@ -73,9 +75,9 @@ export const OrganisationInviteEmailTemplate = ({
                 <Trans>You have been invited to join the following organisation</Trans>
               </Text>
 
-              <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
+              <Text className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-center text-base font-medium text-slate-600">
                 {organisationName}
-              </div>
+              </Text>
 
               <Text className="my-1 text-center text-base">
                 <Trans>
@@ -83,19 +85,25 @@ export const OrganisationInviteEmailTemplate = ({
                 </Trans>
               </Text>
 
-              <Section className="mb-6 mt-6 text-center">
-                <Button
-                  className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
-                  href={`${baseUrl}/organisation/invite/${token}`}
-                >
-                  <Trans>Accept</Trans>
-                </Button>
-                <Button
-                  className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
-                  href={`${baseUrl}/organisation/decline/${token}`}
-                >
-                  <Trans>Decline</Trans>
-                </Button>
+              <Section className="mb-6 mt-6">
+                <Row>
+                  <Column align="right" className="pr-2">
+                    <Button
+                      className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                      href={`${baseUrl}/organisation/invite/${token}`}
+                    >
+                      <Trans>Accept</Trans>
+                    </Button>
+                  </Column>
+                  <Column align="left" className="pl-2">
+                    <Button
+                      className="inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
+                      href={`${baseUrl}/organisation/decline/${token}`}
+                    >
+                      <Trans>Decline</Trans>
+                    </Button>
+                  </Column>
+                </Row>
               </Section>
             </Section>
           </Container>

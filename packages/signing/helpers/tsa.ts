@@ -3,6 +3,11 @@ import { once } from 'remeda';
 
 import { NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY } from '@documenso/lib/constants/app';
 
+export type TimestampAuthorityConfig = {
+  url: string;
+  authority: HttpTimestampAuthority;
+};
+
 const setupTimestampAuthorities = once(() => {
   const timestampAuthority = NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY();
 
@@ -13,9 +18,13 @@ const setupTimestampAuthorities = once(() => {
   const timestampAuthorities = timestampAuthority
     .trim()
     .split(',')
+    .map((url) => url.trim())
     .filter(Boolean)
     .map((url) => {
-      return new HttpTimestampAuthority(url);
+      return {
+        url,
+        authority: new HttpTimestampAuthority(url),
+      };
     });
 
   return timestampAuthorities;
@@ -28,6 +37,9 @@ export const getTimestampAuthority = () => {
     return null;
   }
 
-  // Pick a random authority
-  return authorities[Math.floor(Math.random() * authorities.length)];
+  return authorities[0] ?? null;
+};
+
+export const getTimestampAuthorities = () => {
+  return setupTimestampAuthorities() ?? [];
 };

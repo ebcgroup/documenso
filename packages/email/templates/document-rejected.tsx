@@ -33,7 +33,6 @@ export function DocumentRejectedEmail({
   return (
     <Html>
       <Head />
-      <Preview>{previewText}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

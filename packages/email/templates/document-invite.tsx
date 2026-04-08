@@ -60,7 +60,6 @@ export const DocumentInviteEmailTemplate = ({
   return (
     <Html>
       <Head />
-      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

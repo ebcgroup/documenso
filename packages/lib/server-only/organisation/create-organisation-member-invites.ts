@@ -1,5 +1,3 @@
-import { createElement } from 'react';
-
 import { msg } from '@lingui/core/macro';
 import type { Organisation, Prisma } from '@prisma/client';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
@@ -7,7 +5,6 @@ import { nanoid } from 'nanoid';
 
 import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { mailer } from '@documenso/email/mailer';
-import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -19,7 +16,6 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
 import { validateIfSubscriptionIsRequired } from '../../utils/billing';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
-import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getMemberOrganisationRole } from '../team/get-member-roles';
 
@@ -181,14 +177,6 @@ export const sendOrganisationMemberInviteEmail = async ({
   token,
   organisation,
 }: SendOrganisationMemberInviteEmailOptions) => {
-  const template = createElement(OrganisationInviteEmailTemplate, {
-    assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    baseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    senderName,
-    token,
-    organisationName: organisation.name,
-  });
-
   const { branding, emailLanguage, senderEmail } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
@@ -197,19 +185,37 @@ export const sendOrganisationMemberInviteEmail = async ({
     },
   });
 
-  const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-    }),
-    renderEmailWithI18N(template, {
-      lang: emailLanguage,
-      branding,
-      plainText: true,
-    }),
-  ]);
-
   const i18n = await getI18nInstance(emailLanguage);
+  const baseUrl = NEXT_PUBLIC_WEBAPP_URL();
+  const acceptUrl = `${baseUrl}/organisation/invite/${token}`;
+  const declineUrl = `${baseUrl}/organisation/decline/${token}`;
+
+  const intro = i18n._(msg`You have been invited to join the following organisation on Documenso:`);
+  const invitedBy = i18n._(msg`Invited by`);
+  const acceptLabel = i18n._(msg`Accept invitation`);
+  const declineLabel = i18n._(msg`Decline invitation`);
+
+  const text = [
+    intro,
+    organisation.name,
+    '',
+    `${invitedBy}: ${senderName}`,
+    '',
+    `${acceptLabel}: ${acceptUrl}`,
+    `${declineLabel}: ${declineUrl}`,
+  ].join('\n');
+
+  const html = createSimpleOrganisationInviteHtml({
+    organisationName: organisation.name,
+    senderName,
+    acceptUrl,
+    declineUrl,
+    intro,
+    invitedBy,
+    acceptLabel,
+    declineLabel,
+    brandingCompanyDetails: branding.brandingCompanyDetails,
+  });
 
   await mailer.sendMail({
     to: email,
@@ -218,4 +224,69 @@ export const sendOrganisationMemberInviteEmail = async ({
     html,
     text,
   });
+};
+
+type CreateSimpleOrganisationInviteHtmlOptions = {
+  organisationName: string;
+  senderName: string;
+  acceptUrl: string;
+  declineUrl: string;
+  intro: string;
+  invitedBy: string;
+  acceptLabel: string;
+  declineLabel: string;
+  brandingCompanyDetails?: string;
+};
+
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+
+const createSimpleOrganisationInviteHtml = ({
+  organisationName,
+  senderName,
+  acceptUrl,
+  declineUrl,
+  intro,
+  invitedBy,
+  acceptLabel,
+  declineLabel,
+  brandingCompanyDetails,
+}: CreateSimpleOrganisationInviteHtmlOptions) => {
+  const escapedOrganisationName = escapeHtml(organisationName);
+  const escapedSenderName = escapeHtml(senderName);
+  const escapedIntro = escapeHtml(intro);
+  const escapedInvitedBy = escapeHtml(invitedBy);
+  const escapedAcceptLabel = escapeHtml(acceptLabel);
+  const escapedDeclineLabel = escapeHtml(declineLabel);
+  const escapedBrandingCompanyDetails = brandingCompanyDetails
+    ? escapeHtml(brandingCompanyDetails).replaceAll('\n', '<br />')
+    : '';
+
+  return `<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:24px;font-family:Arial,sans-serif;color:#0f172a;background:#ffffff;">
+    <div style="max-width:600px;margin:0 auto;">
+      <h2 style="margin:0 0 16px;">Join ${escapedOrganisationName} on Documenso</h2>
+      <p style="margin:0 0 16px;">${escapedIntro}</p>
+      <p style="margin:0 0 16px;"><strong>${escapedOrganisationName}</strong></p>
+      <p style="margin:0 0 24px;">${escapedInvitedBy}: ${escapedSenderName}</p>
+      <p style="margin:0 0 12px;">
+        <a href="${acceptUrl}" style="color:#0f172a;">${escapedAcceptLabel}</a>
+      </p>
+      <p style="margin:0 0 24px;">
+        <a href="${declineUrl}" style="color:#475569;">${escapedDeclineLabel}</a>
+      </p>
+      ${
+        escapedBrandingCompanyDetails
+          ? `<p style="margin:24px 0 0;color:#64748b;font-size:12px;">${escapedBrandingCompanyDetails}</p>`
+          : ''
+      }
+    </div>
+  </body>
+</html>`;
 };

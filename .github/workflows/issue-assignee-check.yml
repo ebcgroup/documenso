@@ -1,8 +1,7 @@
 name: 'Issue Assignee Check'
 
 on:
-  issues:
-    types: ['assigned']
+  workflow_dispatch:
 
 permissions:
   issues: write

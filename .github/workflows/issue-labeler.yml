@@ -1,8 +1,7 @@
 name: Auto Label Assigned Issues
 
 on:
-  issues:
-    types: [assigned]
+  workflow_dispatch:
 
 jobs:
   label-when-assigned:

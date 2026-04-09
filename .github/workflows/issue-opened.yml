@@ -1,8 +1,7 @@
 name: 'Label Issues'
 
 on:
-  issues:
-    types: ['opened', 'reopened']
+  workflow_dispatch:
 
 jobs:
   label_issues:

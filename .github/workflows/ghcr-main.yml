@@ -16,6 +16,8 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      TEAMS_GHCR_WEBHOOK_URL: ${{ secrets.TEAMS_GHCR_WEBHOOK_URL }}
 
     steps:
       - name: Checkout
@@ -71,10 +73,9 @@ jobs:
             NEXT_PRIVATE_TELEMETRY_HOST=${{ secrets.NEXT_PRIVATE_TELEMETRY_HOST }}
 
       - name: Notify Teams on publish success
-        if: ${{ success() && secrets.TEAMS_GHCR_WEBHOOK_URL != '' }}
+        if: ${{ success() && env.TEAMS_GHCR_WEBHOOK_URL != '' }}
         shell: bash
         env:
-          TEAMS_GHCR_WEBHOOK_URL: ${{ secrets.TEAMS_GHCR_WEBHOOK_URL }}
           IMAGE_NAME: ${{ steps.image.outputs.name }}
           IMAGE_TAG: commit-${{ github.sha }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -114,10 +115,9 @@ jobs:
           curl -fsS -H "Content-Type: application/json" -d "$payload" "$TEAMS_GHCR_WEBHOOK_URL"
 
       - name: Notify Teams on publish failure
-        if: ${{ failure() && secrets.TEAMS_GHCR_WEBHOOK_URL != '' }}
+        if: ${{ failure() && env.TEAMS_GHCR_WEBHOOK_URL != '' }}
         shell: bash
         env:
-          TEAMS_GHCR_WEBHOOK_URL: ${{ secrets.TEAMS_GHCR_WEBHOOK_URL }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           payload="$(cat <<EOF

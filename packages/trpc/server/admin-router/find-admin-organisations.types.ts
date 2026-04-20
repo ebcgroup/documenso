@@ -1,3 +1,4 @@
+import { OrganisationType } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
@@ -8,6 +9,7 @@ import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 export const ZFindAdminOrganisationsRequestSchema = ZFindSearchParamsSchema.extend({
   ownerUserId: z.number().optional(),
   memberUserId: z.number().optional(),
+  type: z.nativeEnum(OrganisationType).optional(),
 });
 
 export const ZFindAdminOrganisationsResponseSchema = ZFindResultResponse.extend({
@@ -18,6 +20,7 @@ export const ZFindAdminOrganisationsResponseSchema = ZFindResultResponse.extend(
     name: true,
     url: true,
     customerId: true,
+    type: true,
   })
     .extend({
       owner: UserSchema.pick({

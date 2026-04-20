@@ -1,11 +1,10 @@
 import { z } from 'zod';
 
-import { ZPasswordSchema } from '@documenso/lib/utils/password-schema';
 import { zEmail } from '@documenso/lib/utils/zod';
 
 export const ZCreateUserRequestSchema = z.object({
+  name: z.string().min(1),
   email: zEmail(),
-  password: ZPasswordSchema,
 });
 
 export const ZCreateUserResponseSchema = z.object({

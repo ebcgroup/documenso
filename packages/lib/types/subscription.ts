@@ -122,8 +122,8 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.FREE]: {
     id: INTERNAL_CLAIM_ID.FREE,
     name: 'Free',
-    teamCount: 1,
-    memberCount: 1,
+    teamCount: 0,
+    memberCount: 0,
     envelopeItemCount: 5,
     locked: true,
     flags: {},

@@ -1,3 +1,4 @@
+import { OrganisationType } from '@prisma/client';
 import { useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
@@ -11,10 +12,10 @@ import {
   UserIcon,
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
 import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -37,13 +38,33 @@ type AdminOrganisationsTableOptions = {
   memberUserId?: number;
   showOwnerColumn?: boolean;
   hidePaginationUntilOverflow?: boolean;
+  organisationType?: OrganisationType;
 };
+
+const ZAdminOrganisationUrlSearchParamsSchema = z.object({
+  query: z
+    .string()
+    .optional()
+    .catch(() => undefined),
+  page: z.coerce
+    .number()
+    .min(1)
+    .optional()
+    .catch(() => undefined),
+  perPage: z.coerce
+    .number()
+    .min(1)
+    .max(100)
+    .optional()
+    .catch(() => undefined),
+});
 
 export const AdminOrganisationsTable = ({
   ownerUserId,
   memberUserId,
   showOwnerColumn = true,
   hidePaginationUntilOverflow,
+  organisationType,
 }: AdminOrganisationsTableOptions) => {
   const { t, i18n } = useLingui();
 
@@ -56,7 +77,9 @@ export const AdminOrganisationsTable = ({
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
+  const parsedSearchParams = ZAdminOrganisationUrlSearchParamsSchema.parse(
+    Object.fromEntries(searchParams ?? []),
+  );
 
   const { data, isLoading, isLoadingError } = trpc.admin.organisation.find.useQuery({
     query: parsedSearchParams.query,
@@ -64,6 +87,7 @@ export const AdminOrganisationsTable = ({
     perPage: parsedSearchParams.perPage,
     ownerUserId,
     memberUserId,
+    type: organisationType,
   });
 
   const onPaginationChange = (page: number, perPage: number) => {

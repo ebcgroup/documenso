@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma, type OrganisationType } from '@prisma/client';
 
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
 import { prisma } from '@documenso/prisma';
@@ -13,7 +13,7 @@ export const findAdminOrganisationsRoute = adminProcedure
   .input(ZFindAdminOrganisationsRequestSchema)
   .output(ZFindAdminOrganisationsResponseSchema)
   .query(async ({ input }) => {
-    const { query, page, perPage, ownerUserId, memberUserId } = input;
+    const { query, page, perPage, ownerUserId, memberUserId, type } = input;
 
     return await findAdminOrganisations({
       query,
@@ -21,6 +21,7 @@ export const findAdminOrganisationsRoute = adminProcedure
       perPage,
       ownerUserId,
       memberUserId,
+      type,
     });
   });
 
@@ -30,6 +31,7 @@ type FindAdminOrganisationsOptions = {
   perPage?: number;
   ownerUserId?: number;
   memberUserId?: number;
+  type?: OrganisationType;
 };
 
 export const findAdminOrganisations = async ({
@@ -38,6 +40,7 @@ export const findAdminOrganisations = async ({
   perPage = 10,
   ownerUserId,
   memberUserId,
+  type,
 }: FindAdminOrganisationsOptions) => {
   let whereClause: Prisma.OrganisationWhereInput = {};
 
@@ -120,6 +123,13 @@ export const findAdminOrganisations = async ({
     };
   }
 
+  if (type) {
+    whereClause = {
+      ...whereClause,
+      type,
+    };
+  }
+
   const orderBy: Prisma.OrganisationOrderByWithRelationInput[] = query
     ? [{ subscription: { status: 'asc' } }, { name: 'asc' }]
     : [{ createdAt: 'desc' }];
@@ -137,6 +147,7 @@ export const findAdminOrganisations = async ({
         name: true,
         url: true,
         customerId: true,
+        type: true,
         owner: {
           select: {
             id: true,

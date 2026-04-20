@@ -5,7 +5,6 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { PlusCircle } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
@@ -26,6 +25,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -53,18 +53,18 @@ export const AdminUserCreateDialog = ({
   const form = useForm<TCreateUserFormSchema>({
     resolver: zodResolver(ZCreateUserRequestSchema),
     defaultValues: {
+      name: '',
       email: '',
-      password: '',
     },
   });
 
   const { mutateAsync: createUser } = trpc.admin.user.create.useMutation();
 
-  const onFormSubmit = async ({ email, password }: TCreateUserFormSchema) => {
+  const onFormSubmit = async ({ name, email }: TCreateUserFormSchema) => {
     try {
       await createUser({
+        name,
         email,
-        password,
       });
 
       await revalidate();
@@ -73,7 +73,7 @@ export const AdminUserCreateDialog = ({
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`User created`),
+        description: _(msg`User created and password reset email sent`),
         duration: 5000,
       });
     } catch (err) {
@@ -103,7 +103,6 @@ export const AdminUserCreateDialog = ({
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="secondary">
-            <PlusCircle className="mr-2 h-4 w-4" />
             <Trans>Create user</Trans>
           </Button>
         )}
@@ -116,7 +115,7 @@ export const AdminUserCreateDialog = ({
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>Create a user with an email address and password.</Trans>
+            <Trans>Create a user with a name and email address.</Trans>
           </DialogDescription>
         </DialogHeader>
 
@@ -128,11 +127,11 @@ export const AdminUserCreateDialog = ({
             >
               <FormField
                 control={form.control}
-                name="email"
+                name="name"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>
-                      <Trans>Email address</Trans>
+                      <Trans>Name</Trans>
                     </FormLabel>
                     <FormControl>
                       <Input {...field} />
@@ -144,15 +143,18 @@ export const AdminUserCreateDialog = ({
 
               <FormField
                 control={form.control}
-                name="password"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>
-                      <Trans>Password</Trans>
+                      <Trans>Email address</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input {...field} />
                     </FormControl>
+                    <FormDescription>
+                      <Trans>The user will receive a password reset email to set their password.</Trans>
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

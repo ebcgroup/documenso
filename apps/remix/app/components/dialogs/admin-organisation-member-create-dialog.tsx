@@ -285,7 +285,7 @@ const AdminUserSearchCombobox = ({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContent className="z-[1100] w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command>
           <CommandInput
             placeholder={_(msg`Search by name or email`)}

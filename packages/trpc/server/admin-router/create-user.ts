@@ -7,11 +7,12 @@ export const createUserRoute = adminProcedure
   .input(ZCreateUserRequestSchema)
   .output(ZCreateUserResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { email } = input;
+    const { email, name } = input;
 
     ctx.logger.info({
       input: {
         email,
+        name,
       },
     });
 

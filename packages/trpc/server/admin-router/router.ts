@@ -1,7 +1,9 @@
 import { router } from '../trpc';
+import { addUserToOrganisationRoute } from './add-user-to-organisation';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
+import { createUserRoute } from './create-user';
 import { deleteDocumentRoute } from './delete-document';
 import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
 import { deleteUserRoute } from './delete-user';
@@ -15,6 +17,7 @@ import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
+import { findUsersRoute } from './find-users';
 import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
@@ -42,6 +45,7 @@ export const adminRouter = router({
     swapSubscription: swapOrganisationSubscriptionRoute,
   },
   organisationMember: {
+    add: addUserToOrganisationRoute,
     promoteToOwner: promoteMemberToOwnerRoute,
     updateRole: updateOrganisationMemberRoleRoute,
   },
@@ -58,6 +62,8 @@ export const adminRouter = router({
     resync: resyncLicenseRoute,
   },
   user: {
+    create: createUserRoute,
+    find: findUsersRoute,
     get: getUserRoute,
     update: updateUserRoute,
     delete: deleteUserRoute,

@@ -2,6 +2,7 @@ import { Trans } from '@lingui/react/macro';
 
 import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
 
+import { AdminUserCreateDialog } from '~/components/dialogs/admin-user-create-dialog';
 import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
 
 import type { Route } from './+types/users._index';
@@ -30,9 +31,13 @@ export default function AdminManageUsersPage({ loaderData }: Route.ComponentProp
 
   return (
     <div>
-      <h2 className="text-4xl font-semibold">
-        <Trans>Manage users</Trans>
-      </h2>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-4xl font-semibold">
+          <Trans>Manage users</Trans>
+        </h2>
+
+        <AdminUserCreateDialog />
+      </div>
 
       <AdminDashboardUsersTable
         users={users}

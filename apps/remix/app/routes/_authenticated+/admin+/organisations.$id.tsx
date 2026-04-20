@@ -45,6 +45,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
+import { AdminOrganisationMemberCreateDialog } from '~/components/dialogs/admin-organisation-member-create-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -397,9 +398,13 @@ export default function OrganisationGroupSettingsPage({
 
       <div className="mt-16 space-y-10">
         <div>
-          <label className="text-sm font-medium leading-none">
-            <Trans>Organisation Members</Trans>
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-medium leading-none">
+              <Trans>Organisation Members</Trans>
+            </label>
+
+            <AdminOrganisationMemberCreateDialog organisationId={organisationId} />
+          </div>
 
           <div className="my-2">
             <DataTable columns={organisationMembersColumns} data={organisation.members} />

@@ -8,7 +8,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { createPersonalOrganisation } from '../organisation/create-organisation';
 
 export interface CreateUserOptions {
-  name: string;
+  name?: string | null;
   email: string;
   password: string;
   signature?: string | null;
@@ -30,7 +30,7 @@ export const createUser = async ({ name, email, password, signature }: CreateUse
   const user = await prisma.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: {
-        name,
+        name: name ?? null,
         email: email.toLowerCase(),
         password: hashedPassword, // Todo: (RR7) Drop password.
         signature,

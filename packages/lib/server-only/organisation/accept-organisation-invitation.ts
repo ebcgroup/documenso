@@ -1,4 +1,4 @@
-import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
+import type { OrganisationGroup, OrganisationMemberRole, Prisma } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
@@ -92,13 +92,17 @@ export const addUserToOrganisation = async ({
   organisationGroups,
   organisationMemberRole,
   bypassEmail = false,
+  tx,
 }: {
   userId: number;
   organisationId: string;
   organisationGroups: OrganisationGroup[];
   organisationMemberRole: OrganisationMemberRole;
   bypassEmail?: boolean;
+  tx?: Prisma.TransactionClient;
 }) => {
+  const db = tx ?? prisma;
+
   const organisationGroupToUse = organisationGroups.find(
     (group) =>
       group.type === OrganisationGroupType.INTERNAL_ORGANISATION &&
@@ -111,7 +115,7 @@ export const addUserToOrganisation = async ({
     });
   }
 
-  await prisma.organisationMember.create({
+  await db.organisationMember.create({
     data: {
       id: generateDatabaseId('member'),
       userId,

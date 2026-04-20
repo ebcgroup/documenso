@@ -78,6 +78,7 @@ jobs:
         env:
           IMAGE_NAME: ${{ steps.image.outputs.name }}
           IMAGE_TAG: commit-${{ github.sha }}
+          IMAGE_REFERENCE: ${{ steps.image.outputs.name }}:commit-${{ github.sha }}
           WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           payload="$(cat <<EOF
@@ -94,6 +95,7 @@ jobs:
                   { "name": "Branch", "value": "${{ github.ref_name }}" },
                   { "name": "Commit", "value": "${{ github.sha }}" },
                   { "name": "Image", "value": "${IMAGE_NAME}:${IMAGE_TAG}" },
+                  { "name": "Deploy image", "value": "${IMAGE_REFERENCE}" },
                   { "name": "Actor", "value": "${{ github.actor }}" }
                 ],
                 "markdown": true

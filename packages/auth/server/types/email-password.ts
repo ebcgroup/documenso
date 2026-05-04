@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { ZPasswordSchema } from '@documenso/lib/utils/password-schema';
 import { zEmail } from '@documenso/lib/utils/zod';
 
@@ -20,7 +21,7 @@ export const ZSignInSchema = z.object({
 export type TSignInSchema = z.infer<typeof ZSignInSchema>;
 
 export const ZSignUpSchema = z.object({
-  name: z.string().min(1),
+  name: ZNameSchema,
   email: zEmail(),
   password: ZPasswordSchema,
   signature: z.string().nullish(),

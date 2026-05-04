@@ -44,6 +44,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { AdminOrganisationMemberCreateDialog } from '~/components/dialogs/admin-organisation-member-create-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
@@ -136,6 +137,10 @@ export default function OrganisationGroupSettingsPage({
   }, [i18n, t]);
 
   const organisationMembersColumns = useMemo(() => {
+    if (!organisation) {
+      return [];
+    }
+
     return [
       {
         header: t`Member`,
@@ -165,10 +170,6 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Role`,
         cell: ({ row }) => {
-          if (!organisation) {
-            return null;
-          }
-
           const isOwner = row.original.userId === organisation.ownerUserId;
 
           if (isOwner) {
@@ -202,7 +203,9 @@ export default function OrganisationGroupSettingsPage({
       {
         header: t`Actions`,
         cell: ({ row }) => {
-          const isOwner = row.original.userId === organisation?.ownerUserId;
+          const isOwner = row.original.userId === organisation.ownerUserId;
+
+          const memberName = row.original.user.name ?? row.original.user.email;
 
           return (
             <div className="flex justify-end space-x-2">
@@ -216,6 +219,16 @@ export default function OrganisationGroupSettingsPage({
                 organisationMember={row.original}
                 isOwner={isOwner}
               />
+
+              {!isOwner && (
+                <AdminOrganisationMemberDeleteDialog
+                  organisationId={organisationId}
+                  organisationName={organisation.name}
+                  organisationMemberId={row.original.id}
+                  organisationMemberName={memberName}
+                  organisationMemberEmail={row.original.user.email}
+                />
+              )}
             </div>
           );
         },

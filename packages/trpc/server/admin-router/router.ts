@@ -5,7 +5,9 @@ import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
 import { createUserRoute } from './create-user';
 import { deleteDocumentRoute } from './delete-document';
+import { deleteAdminOrganisationMemberRoute } from './delete-organisation-member';
 import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
+import { deleteAdminTeamMemberRoute } from './delete-team-member';
 import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
@@ -48,6 +50,7 @@ export const adminRouter = router({
     add: addUserToOrganisationRoute,
     promoteToOwner: promoteMemberToOwnerRoute,
     updateRole: updateOrganisationMemberRoleRoute,
+    delete: deleteAdminOrganisationMemberRoute,
   },
   claims: {
     find: findSubscriptionClaimsRoute,
@@ -91,6 +94,9 @@ export const adminRouter = router({
   },
   team: {
     get: getAdminTeamRoute,
+  },
+  teamMember: {
+    delete: deleteAdminTeamMemberRoute,
   },
   updateSiteSetting: updateSiteSettingRoute,
 });

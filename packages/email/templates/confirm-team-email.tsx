@@ -11,7 +11,7 @@ import {
   Html,
   Img,
   Link,
-    Section,
+  Section,
   Text,
 } from '../components';
 import { useBranding } from '../providers/branding';
@@ -41,50 +41,41 @@ export const ConfirmTeamEmailTemplate = ({
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white">
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 px-2 pt-2 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid px-2 pt-2 backdrop-blur-sm">
             {branding.brandingEnabled && branding.brandingLogo ? (
               <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6 p-2" />
             ) : (
-              <TemplateImage
-                assetBaseUrl={assetBaseUrl}
-                className="mb-4 h-6 p-2"
-                staticAsset="logo.png"
-              />
+              <TemplateImage assetBaseUrl={assetBaseUrl} className="mb-4 h-6 p-2" staticAsset="logo.png" />
             )}
 
             <Section>
-              <TemplateImage
-                className="mx-auto"
-                assetBaseUrl={assetBaseUrl}
-                staticAsset="mail-open.png"
-              />
+              <TemplateImage className="mx-auto" assetBaseUrl={assetBaseUrl} staticAsset="mail-open.png" />
             </Section>
 
             <Section className="p-2 text-slate-500">
-              <Text className="text-center text-lg font-medium text-black">
+              <Text className="text-center font-medium text-black text-lg">
                 <Trans>Verify your team email address</Trans>
               </Text>
 
               <Text className="text-center text-base">
                 <Trans>
-                  <span className="font-bold">{teamName}</span> has requested to use your email
-                  address for their team on Documenso.
+                  <span className="font-bold">{teamName}</span> has requested to use your email address for their team
+                  on Documenso.
                 </Trans>
               </Text>
 
-              <div className="mx-auto mt-6 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
+              <div className="mx-auto mt-6 w-fit rounded-lg bg-gray-50 px-4 py-2 font-medium text-base text-slate-600">
                 {formatTeamUrl(teamUrl, baseUrl)}
               </div>
 
               <Section className="mt-6">
                 <Text className="my-0 text-sm">
                   <Trans>
-                    By accepting this request, you will be granting <strong>{teamName}</strong>{' '}
-                    access to:
+                    By accepting this request, you will be granting <strong>{teamName}</strong> access to:
                   </Trans>
                 </Text>
 
-                <ul className="mb-0 mt-2">
+                <ul className="mt-2 mb-0">
                   <li className="text-sm">
                     <Trans>View all documents sent to and from this email address</Trans>
                   </li>
@@ -104,9 +95,9 @@ export const ConfirmTeamEmailTemplate = ({
                 </Text>
               </Section>
 
-              <Section className="mb-6 mt-8 text-center">
+              <Section className="mt-8 mb-6 text-center">
                 <Button
-                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center font-medium text-black text-sm no-underline"
                   href={`${baseUrl}/team/verify/email/${token}`}
                 >
                   <Trans>Accept</Trans>
@@ -114,7 +105,7 @@ export const ConfirmTeamEmailTemplate = ({
               </Section>
             </Section>
 
-            <Text className="text-center text-xs text-slate-500">
+            <Text className="text-center text-slate-500 text-xs">
               <Trans>Link expires in 1 hour.</Trans>
             </Text>
           </Container>

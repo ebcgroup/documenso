@@ -1,13 +1,9 @@
-import { z } from 'zod';
-
 import { ZNameSchema } from '@documenso/lib/constants/auth';
 import { ZPasswordSchema } from '@documenso/lib/utils/password-schema';
 import { zEmail } from '@documenso/lib/utils/zod';
+import { z } from 'zod';
 
-export const ZCurrentPasswordSchema = z
-  .string()
-  .min(6, { message: 'Must be at least 6 characters in length' })
-  .max(72);
+export const ZCurrentPasswordSchema = z.string().min(6, { message: 'Must be at least 6 characters in length' }).max(72);
 
 export const ZSignInSchema = z.object({
   email: zEmail().min(1),

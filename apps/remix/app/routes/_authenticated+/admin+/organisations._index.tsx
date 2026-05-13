@@ -60,11 +60,7 @@ export default function Organisations() {
 
   return (
     <div>
-      <SettingsHeader
-        hideDivider
-        title={t`Manage organisations`}
-        subtitle={t`Search and manage all organisations`}
-      />
+      <SettingsHeader hideDivider title={t`Manage organisations`} subtitle={t`Search and manage all organisations`} />
 
       <div className="mt-4">
         <Tabs

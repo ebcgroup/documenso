@@ -1,4 +1,4 @@
-import { Trans, msg } from '@lingui/macro';
+import { Trans } from '@lingui/macro';
 
 import { Body, Container, Head, Html, Section, Text } from '../components';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -21,13 +21,12 @@ export const BulkSendCompleteEmail = ({
   failedCount,
   errors,
 }: BulkSendCompleteEmailProps) => {
-
   return (
     <Html>
       <Head />
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
-          <Container className="mx-auto mb-2 mt-8 max-w-xl rounded-lg border border-solid border-slate-200 p-4 backdrop-blur-sm">
+          <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">
             <Section>
               <Text className="text-sm">
                 <Trans>Hi {userName},</Trans>
@@ -37,7 +36,7 @@ export const BulkSendCompleteEmail = ({
                 <Trans>Your bulk send operation for template "{templateName}" has completed.</Trans>
               </Text>
 
-              <Text className="text-lg font-semibold">
+              <Text className="font-semibold text-lg">
                 <Trans>Summary:</Trans>
               </Text>
 
@@ -55,13 +54,13 @@ export const BulkSendCompleteEmail = ({
 
               {failedCount > 0 && (
                 <Section className="mt-4">
-                  <Text className="text-lg font-semibold">
+                  <Text className="font-semibold text-lg">
                     <Trans>The following errors occurred:</Trans>
                   </Text>
 
                   <ul className="my-2 ml-4 list-inside list-disc">
                     {errors.map((error, index) => (
-                      <li key={index} className="text-destructive mt-1 text-sm text-slate-400">
+                      <li key={index} className="mt-1 text-destructive text-slate-400 text-sm">
                         {error}
                       </li>
                     ))}
@@ -71,8 +70,8 @@ export const BulkSendCompleteEmail = ({
 
               <Text className="text-sm">
                 <Trans>
-                  You can view the created documents in your dashboard under the "Documents created
-                  from template" section.
+                  You can view the created documents in your dashboard under the "Documents created from template"
+                  section.
                 </Trans>
               </Text>
             </Section>

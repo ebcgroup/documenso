@@ -380,12 +380,28 @@ export class LocalJobProvider extends BaseJobProvider {
     }
 
     console.log('Submitting job to endpoint:', endpoint);
+
+    const request = fetch(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers,
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          const responseText = await response.text().catch(() => '');
+
+          console.error(
+            `[JOBS]: Failed to submit job ${jobDefinitionId} to ${endpoint}. ` +
+              `Status: ${response.status} ${response.statusText}. ${responseText}`,
+          );
+        }
+      })
+      .catch((error: unknown) => {
+        console.error(`[JOBS]: Failed to submit job ${jobDefinitionId} to ${endpoint}`, error);
+      });
+
     await Promise.race([
-      fetch(endpoint, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers,
-      }).catch(() => null),
+      request,
       new Promise((resolve) => {
         setTimeout(resolve, 150);
       }),

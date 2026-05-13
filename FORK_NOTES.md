@@ -19,6 +19,29 @@ Get-ChildItem -Path .\packages\email -Recurse -Include *.tsx -File |
 
 Expected result: no matches.
 
+## Self-Hosted Background Jobs
+
+Initial document signing emails are sent by the background job system. Manual resend
+emails are sent directly from the request path, so resend can work even when background
+jobs are misconfigured.
+
+Important files:
+
+- `packages/lib/jobs/client/local.ts`
+- `packages/lib/server-only/document/send-document.ts`
+
+Expected behavior:
+
+- Local job submission logs non-OK responses or request failures when the app cannot
+  call its own `/api/jobs/...` endpoint.
+- Sequential signing filters out already-sent recipients before enqueueing email jobs.
+
+Deployment check:
+
+- In Docker/Dokploy, set `NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000` when
+  using the default `local` jobs provider, or use `NEXT_PRIVATE_JOBS_PROVIDER=bullmq`
+  with Redis for more reliable self-hosted production jobs.
+
 ## PDF Timestamp Authorities
 
 Signing should try all configured timestamp authorities in order. It should log each
@@ -128,4 +151,3 @@ Expected behavior:
 - Teams notification uses `TEAMS_GHCR_WEBHOOK_URL`.
 - Success message includes a copyable `Deploy image` value such as:
   `ghcr.io/ebcgroup/documenso:commit-<sha>`.
-

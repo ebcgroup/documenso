@@ -1,8 +1,9 @@
 import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { match } from 'ts-pattern';
-import { Body, Container, Head, Hr, Html, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
 
@@ -23,9 +24,12 @@ export const OrganisationLimitAlertEmailTemplate = ({
 }: OrganisationLimitAlertEmailProps) => {
   const { _ } = useLingui();
 
+  const previewText = kind === 'quotaNearing' ? msg`Approaching Your Plan Limits` : msg`Organisation Review Required`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white text-slate-500">

@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Section } from '../components';
+import { Body, Container, Head, Hr, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
 import type { TemplateRecipientExpiredProps } from '../template-components/template-recipient-expired';
@@ -17,9 +18,12 @@ export const RecipientExpiredTemplate = ({
 }: RecipientExpiredEmailTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`The signing window for "${recipientName}" on document "${documentName}" has expired.`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

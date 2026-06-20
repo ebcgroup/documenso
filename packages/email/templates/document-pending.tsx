@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Section } from '../components';
+import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import type { TemplateDocumentPendingProps } from '../template-components/template-document-pending';
 import { TemplateDocumentPending } from '../template-components/template-document-pending';
@@ -14,9 +15,12 @@ export const DocumentPendingEmailTemplate = ({
 }: DocumentPendingEmailTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`Pending Document`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white">

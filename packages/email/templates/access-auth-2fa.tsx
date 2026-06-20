@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Section } from '../components';
+import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { TemplateAccessAuth2FA } from '../template-components/template-access-auth-2fa';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -24,9 +25,12 @@ export const AccessAuth2FAEmailTemplate = ({
 }: AccessAuth2FAEmailTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`Your verification code is ${code}`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

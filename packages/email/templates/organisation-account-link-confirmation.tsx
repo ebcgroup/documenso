@@ -1,7 +1,8 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Button, Container, Head, Hr, Html, Section, Text } from '../components';
+import { Body, Button, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
 import TemplateImage from '../template-components/template-image';
@@ -21,9 +22,15 @@ export const OrganisationAccountLinkConfirmationTemplate = ({
 }: OrganisationAccountLinkConfirmationTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText =
+    type === 'create'
+      ? msg`A request has been made to create an account for you`
+      : msg`A request has been made to link your Documenso account`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
       <Body className="mx-auto my-auto font-sans">
         <Section className="bg-white">
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid px-2 pt-2 backdrop-blur-sm">

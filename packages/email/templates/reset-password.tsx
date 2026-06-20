@@ -1,7 +1,8 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Link, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Link, Preview, Section, Text } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateFooter } from '../template-components/template-footer';
 import type { TemplateResetPasswordProps } from '../template-components/template-reset-password';
@@ -16,9 +17,12 @@ export const ResetPasswordTemplate = ({
 }: ResetPasswordTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`Password Reset Successful`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

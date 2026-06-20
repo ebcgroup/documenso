@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Hr, Html, Section } from '../components';
+import { Body, Container, Head, Hr, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import {
   TemplateDocumentDelete,
@@ -17,9 +18,12 @@ export const DocumentSuperDeleteEmailTemplate = ({
 }: DocumentDeleteEmailTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`An admin has deleted your document "${documentName}".`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

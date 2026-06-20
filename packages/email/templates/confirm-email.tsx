@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Section } from '../components';
+import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import type { TemplateConfirmationEmailProps } from '../template-components/template-confirmation-email';
 import { TemplateConfirmationEmail } from '../template-components/template-confirmation-email';
@@ -12,9 +13,12 @@ export const ConfirmEmailTemplate = ({
 }: TemplateConfirmationEmailProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`Please confirm your email address`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-4 backdrop-blur-sm">

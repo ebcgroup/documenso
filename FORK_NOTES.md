@@ -10,25 +10,31 @@ Last reconciled with upstream: `upstream/main` at Documenso v2.13.0.
 ### Email Rendering
 
 Outlook/SendGrid SMTP had issues with React Email preview padding causing HTML email
-parts to be truncated. This fork removes React Email `<Preview>` usage from email
-templates, including newly added upstream templates.
+parts to be truncated. This fork disables React Email preview output centrally instead
+of editing every template.
 
-Important path:
+Important file:
 
-- `packages/email/templates/*.tsx`
+- `packages/email/components.ts`
 
-Check after upstream merges:
+Expected behavior:
+
+- Templates may keep upstream `Preview` imports and `previewText` variables.
+- The shared `Preview` export in `packages/email/components.ts` must be a no-op component
+  that returns `null`.
+- Templates should continue importing `Preview` from `../components`, not directly from
+  `@react-email/preview`.
+
+Checks after upstream merges:
 
 ```powershell
-rg -n "<Preview|Preview,|previewText" packages/email/templates
+rg -n "export const Preview" packages/email/components.ts
+rg -n "@react-email/preview" packages/email --glob "!package.json"
 ```
 
-Expected result: no matches.
-
-Merge note: when upstream adds a new email template, take the upstream template first,
-then remove `Preview`, `previewText`, and preview-only `msg` imports before committing.
-Documenso v2.13.0 added `admin-user-created.tsx` and `organisation-limit-alert.tsx`; both
-also need this fork rule.
+Expected result: the first command finds the no-op export; the second command finds no
+matches. If upstream adds a direct `@react-email/preview` import, switch it back to the
+shared `../components` export.
 
 ### Self-Hosted Background Jobs
 

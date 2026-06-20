@@ -1,6 +1,7 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Section } from '../components';
+import { Body, Container, Head, Html, Preview, Section } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateDocumentRejectionConfirmed } from '../template-components/template-document-rejection-confirmed';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -22,9 +23,12 @@ export function DocumentRejectionConfirmedEmail({
 }: DocumentRejectionConfirmedEmailProps) {
   const { _ } = useLingui();
 
+  const previewText = _(msg`You have rejected the document '${documentName}'`);
+
   return (
     <Html>
       <Head />
+      <Preview>{previewText}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

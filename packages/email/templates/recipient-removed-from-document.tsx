@@ -1,7 +1,8 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { Body, Container, Head, Hr, Html, Section, Text } from '../components';
+import { Body, Container, Head, Hr, Html, Preview, Section, Text } from '../components';
 import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import type { TemplateDocumentCancelProps } from '../template-components/template-document-cancel';
 import TemplateDocumentImage from '../template-components/template-document-image';
@@ -16,9 +17,12 @@ export const RecipientRemovedFromDocumentTemplate = ({
 }: DocumentCancelEmailTemplateProps) => {
   const { _ } = useLingui();
 
+  const previewText = msg`${inviterName} has removed you from the document ${documentName}.`;
+
   return (
     <Html>
       <Head />
+      <Preview>{_(previewText)}</Preview>
 
       <Body className="mx-auto my-auto bg-white font-sans">
         <Section>

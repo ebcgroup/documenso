@@ -1,9 +1,62 @@
 # Fork Notes
 
 This file tracks intentional EBC fork behavior that still differs from upstream Documenso.
-After merging upstream, use this as the checklist for what must still be true.
+After every upstream merge, update this file so future merges can prefer upstream while
+preserving only the fork fixes or additions that upstream still does not cover.
 
 Last reconciled with upstream: `upstream/main` at Documenso v2.13.0.
+
+## Merge Workflow
+
+Use this workflow whenever pulling a new upstream Documenso release into the fork.
+
+1. Start clean and fetch upstream.
+
+```powershell
+git status --short
+git fetch upstream
+```
+
+2. Merge upstream into the fork branch.
+
+```powershell
+git switch main
+git merge upstream/main
+```
+
+3. For every conflict, prefer upstream structure first, then reapply the smallest EBC
+   delta needed to preserve the behavior listed in `Active Fork Changes`.
+
+Conflict rules:
+
+- If upstream added the same fix or feature, keep upstream and remove the local fork code.
+  Move the item to `Upstream-Resolved Items` with the upstream version noted.
+- If upstream refactored a touched file but did not fix the EBC issue, keep the upstream
+  refactor and reapply our behavior in the smallest central place.
+- If a conflict is only formatting, imports, generated code, or unrelated upstream UI,
+  keep upstream.
+- Do not edit many email templates to solve preview output. Keep templates close to
+  upstream and preserve the central `Preview` no-op export instead.
+- Do not keep old helper files just because they make the merge easier. If upstream has a
+  first-party version, use upstream and delete the fork copy.
+
+4. Run the checks in each active section below.
+
+5. Review the fork delta against upstream before committing.
+
+```powershell
+git diff --stat upstream/main main
+git diff --name-status upstream/main main
+```
+
+Expected result: the diff should mostly match the files listed under `Active Fork Changes`.
+Anything else needs a reason in this file or should be removed.
+
+6. Update this file before committing.
+
+- Update `Last reconciled with upstream`.
+- Move fixed items from `Active Fork Changes` to `Upstream-Resolved Items`.
+- Add any new local fixes with checks that can be run after the next merge.
 
 ## Active Fork Changes
 
@@ -115,9 +168,21 @@ Important files:
 - `apps/remix/app/components/dialogs/admin-organisation-member-create-dialog.tsx`
 - `apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx`
 - `packages/lib/server-only/admin/add-user-to-organisation.ts`
+- `packages/lib/server-only/admin/find-users.ts`
+- `packages/lib/server-only/organisation/accept-organisation-invitation.ts`
 - `packages/trpc/server/admin-router/add-user-to-organisation.ts`
 - `packages/trpc/server/admin-router/find-users.ts`
 - `packages/trpc/server/admin-router/router.ts`
+
+Checks after upstream merges:
+
+```powershell
+rg -n "add: addUserToOrganisationRoute|find: findUsersRoute" packages/trpc/server/admin-router/router.ts
+rg -n "bypassEmail|pendingInvitesToDelete|syncMemberCountWithStripeSeatPlan" packages/lib/server-only/admin/add-user-to-organisation.ts
+```
+
+If upstream adds an equivalent direct-add-member feature, prefer upstream and remove this
+fork implementation.
 
 ### Admin Organisations List
 
@@ -137,31 +202,64 @@ Important files:
 - `packages/trpc/server/admin-router/find-admin-organisations.ts`
 - `packages/trpc/server/admin-router/find-admin-organisations.types.ts`
 
-### GHCR Publishing
+Checks after upstream merges:
+
+```powershell
+rg -n "OrganisationType.PERSONAL|organisationType" apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx apps/remix/app/components/tables/admin-organisations-table.tsx
+rg -n "type: z.nativeEnum\(OrganisationType\)|type," packages/trpc/server/admin-router/find-admin-organisations*
+```
+
+### GHCR Publishing And Workflow Noise
 
 This fork publishes Docker images to GHCR from pushes to `main` and notifies Teams when
-the build finishes.
+the build finishes. Most upstream GitHub workflows are disabled because they are for the
+public upstream project and are noisy or irrelevant for the self-hosted fork.
 
-Important file:
+Important files:
 
 - `.github/workflows/ghcr-main.yml`
+- `.github/workflows/*.yml`
+- `docker/buildx-and-push.sh`
 
 Expected behavior:
 
-- Publishes `latest`, `main`, and `commit-<sha>` tags.
+- `Publish GHCR Image on Main` runs on pushes to `main` and manual dispatch.
+- `Continuous Integration` remains available as the main code-quality workflow.
+- Upstream-only issue, PR, translation, stale, deploy, and release workflows should be
+  manual-only unless there is a specific EBC reason to enable them.
+- GHCR publishes `latest`, `main`, and `commit-<sha>` tags.
 - Teams notification uses `TEAMS_GHCR_WEBHOOK_URL`.
 - Success message includes a copyable `Deploy image` value such as
   `ghcr.io/ebcgroup/documenso:commit-<sha>`.
+
+Checks after upstream merges:
+
+```powershell
+rg -n "push:|schedule:|pull_request:" .github/workflows
+rg -n "Publish GHCR Image on Main|TEAMS_GHCR_WEBHOOK_URL|commit-" .github/workflows/ghcr-main.yml
+```
+
+Expected result: only intentionally active workflows should have automatic triggers.
+Dependabot schedules in `.github/dependabot.yml` are separate from workflow triggers.
 
 ## Upstream-Resolved Items
 
 These were previously fork-only concerns, but latest upstream now covers them. Do not
 reintroduce local patches unless upstream regresses.
 
-- Admin user creation is upstream in v2.13.0 through `create-admin-user`, the admin user
-  create dialog, and `send.admin.user.created.email`.
-- Self-hosted free claim defaults are upstream-safe in v2.13.0 because internal claims
-  are now only `{ id, name }`, with no free-plan quota values to override.
-- Session cookie expiry is fixed upstream by calculating `expires` when issuing the
-  session cookie instead of at process start. This is the fix for logins returning to
-  `/signin` after long container uptime.
+- Admin user creation is upstream in v2.13.0 through `packages/lib/server-only/user/create-admin-user.ts`, the admin user create dialog, and `send.admin.user.created.email`.
+- Do not re-add `packages/lib/server-only/admin/create-user.ts`.
+- Do not move the auth password schema to `packages/lib/utils/password-schema.ts`; keep upstream's schema layout unless upstream changes it.
+- Self-hosted free claim defaults are upstream-safe in v2.13.0 because internal claims are now only `{ id, name }`, with no free-plan quota values to override.
+- Session cookie expiry is fixed upstream by calculating `expires` when issuing the session cookie instead of at process start. This is the fix for logins returning to `/signin` after long container uptime.
+
+Check for accidental reintroduction:
+
+```powershell
+Test-Path packages/lib/server-only/admin/create-user.ts
+Test-Path packages/lib/utils/password-schema.ts
+rg -n "create: createUserRoute" packages/trpc/server/admin-router/router.ts
+```
+
+Expected result: both `Test-Path` commands return `False`, and the router contains one
+`create: createUserRoute` entry.

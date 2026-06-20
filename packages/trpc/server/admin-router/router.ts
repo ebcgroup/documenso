@@ -82,7 +82,6 @@ export const adminRouter = router({
     resync: resyncLicenseRoute,
   },
   user: {
-    create: createUserRoute,
     find: findUsersRoute,
     get: getUserRoute,
     create: createUserRoute,

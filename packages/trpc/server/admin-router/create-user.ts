@@ -1,4 +1,5 @@
-import { createAdminUser } from '@documenso/lib/server-only/admin/create-user';
+import { jobsClient } from '@documenso/lib/jobs/client';
+import { createAdminUser } from '@documenso/lib/server-only/user/create-admin-user';
 
 import { adminProcedure } from '../trpc';
 import { ZCreateUserRequestSchema, ZCreateUserResponseSchema } from './create-user.types';
@@ -9,14 +10,21 @@ export const createUserRoute = adminProcedure
   .mutation(async ({ input, ctx }) => {
     const { email, name } = input;
 
-    ctx.logger.info({
-      input: {
-        email,
-        name,
-      },
+    const user = await createAdminUser({
+      name,
+      email,
     });
 
-    const user = await createAdminUser(input);
+    ctx.logger.info({
+      createdUserId: user.id,
+    });
+
+    await jobsClient.triggerJob({
+      name: 'send.admin.user.created.email',
+      payload: {
+        userId: user.id,
+      },
+    });
 
     return {
       userId: user.id,

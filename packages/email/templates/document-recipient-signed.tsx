@@ -1,6 +1,7 @@
+import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Section } from '../components';
-import { useBranding } from '../providers/branding';
+import { Body, Container, Head, Html, Section } from '../components';
+import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import { TemplateDocumentRecipientSigned } from '../template-components/template-document-recipient-signed';
 import { TemplateFooter } from '../template-components/template-footer';
 
@@ -17,13 +18,9 @@ export const DocumentRecipientSignedEmailTemplate = ({
   recipientEmail = 'lucas@documenso.com',
   assetBaseUrl = 'http://localhost:3002',
 }: DocumentRecipientSignedEmailTemplateProps) => {
-  const branding = useBranding();
+  const { _ } = useLingui();
 
   const recipientReference = recipientName || recipientEmail;
-
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
 
   return (
     <Html>
@@ -33,11 +30,7 @@ export const DocumentRecipientSignedEmailTemplate = ({
         <Section className="bg-white">
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
             <Section className="p-2">
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
-              )}
+              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
               <TemplateDocumentRecipientSigned
                 documentName={documentName}

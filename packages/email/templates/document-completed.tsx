@@ -1,12 +1,14 @@
+import { useLingui } from '@lingui/react';
 
-import { Body, Container, Head, Html, Img, Section } from '../components';
-import { useBranding } from '../providers/branding';
+import { Body, Container, Head, Html, Section } from '../components';
+import { TemplateBrandingLogo } from '../template-components/template-branding-logo';
 import type { TemplateDocumentCompletedProps } from '../template-components/template-document-completed';
 import { TemplateDocumentCompleted } from '../template-components/template-document-completed';
 import { TemplateFooter } from '../template-components/template-footer';
 
 export type DocumentCompletedEmailTemplateProps = Partial<TemplateDocumentCompletedProps> & {
   customBody?: string;
+  reportUrl?: string;
 };
 
 export const DocumentCompletedEmailTemplate = ({
@@ -14,12 +16,9 @@ export const DocumentCompletedEmailTemplate = ({
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
   customBody,
+  reportUrl,
 }: DocumentCompletedEmailTemplateProps) => {
-  const branding = useBranding();
-
-  const getAssetUrl = (path: string) => {
-    return new URL(path, assetBaseUrl).toString();
-  };
+  const { _ } = useLingui();
 
   return (
     <Html>
@@ -29,11 +28,7 @@ export const DocumentCompletedEmailTemplate = ({
         <Section className="bg-white">
           <Container className="mx-auto mt-8 mb-2 max-w-xl rounded-lg border border-slate-200 border-solid p-2 backdrop-blur-sm">
             <Section className="p-2">
-              {branding.brandingEnabled && branding.brandingLogo ? (
-                <Img src={branding.brandingLogo} alt="Branding Logo" className="mb-4 h-6" />
-              ) : (
-                <Img src={getAssetUrl('/static/logo.png')} alt="Documenso Logo" className="mb-4 h-6" />
-              )}
+              <TemplateBrandingLogo assetBaseUrl={assetBaseUrl} className="mb-4 h-6" />
 
               <TemplateDocumentCompleted
                 downloadLink={downloadLink}
@@ -45,7 +40,7 @@ export const DocumentCompletedEmailTemplate = ({
           </Container>
 
           <Container className="mx-auto max-w-xl">
-            <TemplateFooter />
+            <TemplateFooter reportUrl={reportUrl} />
           </Container>
         </Section>
       </Body>

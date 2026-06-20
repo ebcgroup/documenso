@@ -28,8 +28,8 @@ export default function AdminManageUsersPage({ loaderData }: Route.ComponentProp
 
   return (
     <div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="text-4xl font-semibold">
+      <div className="mb-6 flex items-center justify-between">
+        <h2 className="font-semibold text-4xl">
           <Trans>Manage users</Trans>
         </h2>
 

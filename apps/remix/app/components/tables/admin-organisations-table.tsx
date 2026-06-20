@@ -263,7 +263,7 @@ export const AdminOrganisationsTable = ({
         }}
       >
         {(table) =>
-          !hidePaginationUntilOverflow || 1 > table.getPageCount() ? (
+          !hidePaginationUntilOverflow || table.getPageCount() > 1 ? (
             <DataTablePagination additionalInformation="VisibleCount" table={table} />
           ) : null
         }

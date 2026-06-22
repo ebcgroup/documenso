@@ -23,6 +23,7 @@ import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findEmailDomainsRoute } from './find-email-domains';
+import { findEmailJobsRoute } from './find-email-jobs';
 import { findOrganisationStatsRoute } from './find-organisation-stats';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { findUnsealedDocumentsRoute } from './find-unsealed-documents';
@@ -37,6 +38,7 @@ import { reregisterEmailDomainRoute } from './reregister-email-domain';
 import { resealDocumentRoute } from './reseal-document';
 import { resetOrganisationMonthlyStatRoute } from './reset-organisation-monthly-stat';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
+import { retryEmailJobRoute } from './retry-email-job';
 import { resyncLicenseRoute } from './resync-license';
 import { swapOrganisationSubscriptionRoute } from './swap-organisation-subscription';
 import { syncOrganisationSubscriptionRoute } from './sync-organisation-subscription';
@@ -108,6 +110,10 @@ export const adminRouter = router({
     find: findEmailDomainsRoute,
     get: getEmailDomainRoute,
     reregister: reregisterEmailDomainRoute,
+  },
+  emailJob: {
+    find: findEmailJobsRoute,
+    retry: retryEmailJobRoute,
   },
   emailTransport: {
     find: findEmailTransportsRoute,

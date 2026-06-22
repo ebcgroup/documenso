@@ -64,11 +64,12 @@ Anything else needs a reason in this file or should be removed.
 
 Outlook/SendGrid SMTP had issues with React Email preview padding causing HTML email
 parts to be truncated. This fork disables React Email preview output centrally instead
-of editing every template.
+of editing every template, and removes the unused email preview app.
 
-Important file:
+Important files:
 
 - `packages/email/components.ts`
+- `packages/email/preview/`
 
 Expected behavior:
 
@@ -77,47 +78,58 @@ Expected behavior:
   that returns `null`.
 - Templates should continue importing `Preview` from `../components`, not directly from
   `@react-email/preview`.
+- `packages/email/preview/` should stay absent unless we intentionally reintroduce local
+  email preview tooling.
 
 Checks after upstream merges:
 
 ```powershell
 rg -n "export const Preview" packages/email/components.ts
 rg -n "@react-email/preview" packages/email --glob "!package.json"
+Test-Path packages/email/preview
 ```
 
 Expected result: the first command finds the no-op export; the second command finds no
-matches. If upstream adds a direct `@react-email/preview` import, switch it back to the
-shared `../components` export.
+matches; the third returns `False`. If upstream adds a direct `@react-email/preview`
+import, switch it back to the shared `../components` export.
 
-### Self-Hosted Background Jobs
+### Admin Email Job Visibility
 
-Initial document signing emails are sent by the background job system. Manual resend
-emails are sent directly from the request path, so resend can work even when background
-jobs are misconfigured.
+Adds a small admin-only view for email-related `BackgroundJob` rows. It lists status,
+retry counts, timestamps, and payload summaries, and lets admins requeue failed or stale
+pending email jobs. This does not change upstream email send behavior, add infinite
+retries, add backup transports, or add a new email delivery table.
 
 Important files:
 
-- `packages/lib/jobs/client/local.ts`
-- `packages/lib/server-only/document/send-document.ts`
+- `apps/remix/app/routes/_authenticated+/admin+/_layout.tsx`
+- `apps/remix/app/routes/_authenticated+/admin+/email-jobs._index.tsx`
+- `packages/trpc/server/admin-router/email-jobs.ts`
+- `packages/trpc/server/admin-router/find-email-jobs.ts`
+- `packages/trpc/server/admin-router/find-email-jobs.types.ts`
+- `packages/trpc/server/admin-router/retry-email-job.ts`
+- `packages/trpc/server/admin-router/retry-email-job.types.ts`
+- `packages/trpc/server/admin-router/router.ts`
+- `packages/app-tests/e2e/admin/email-jobs.spec.ts`
 
 Expected behavior:
 
-- Local job submission logs non-OK responses or request failures when the app cannot
-  call its own `/api/jobs/...` endpoint.
-- Sequential signing filters out already-sent recipients before enqueueing email jobs.
+- Admin sidebar includes `Email Jobs`.
+- `/admin/email-jobs` filters email jobs by status and search query.
+- Retry queues a fresh job from the original job id and payload only for failed or stale
+  pending jobs.
 
 Checks after upstream merges:
 
 ```powershell
-rg -n "Failed to submit job|Status: \$\{response.status\}" packages/lib/jobs/client/local.ts
-rg -n "sendStatus !== SendStatus.SENT" packages/lib/server-only/document/send-document.ts
+rg -n "emailJob|Email Jobs" packages/trpc/server/admin-router apps/remix/app/routes/_authenticated+/admin+
+rg -n "send.signing.requested.email|send.admin.user.created.email" packages/trpc/server/admin-router/email-jobs.ts
+rg -n "\[ADMIN\]\[EMAIL_JOBS\]" packages/app-tests/e2e/admin/email-jobs.spec.ts
 ```
 
-Deployment check:
-
-- In Docker/Dokploy, set `NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000` when
-  using the default `local` jobs provider, or use `NEXT_PRIVATE_JOBS_PROVIDER=bullmq`
-  with Redis for more reliable self-hosted production jobs.
+If upstream adds an equivalent general jobs dashboard or email delivery overview, prefer
+upstream and remove this fork implementation unless the upstream feature lacks the
+self-hosted retry visibility needed here.
 
 ### PDF Timestamp Authorities
 

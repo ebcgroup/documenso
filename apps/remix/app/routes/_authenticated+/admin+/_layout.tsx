@@ -11,6 +11,7 @@ import {
   Building2Icon,
   FileStack,
   LineChartIcon,
+  MailCheckIcon,
   MailIcon,
   Settings,
   Trophy,
@@ -137,6 +138,17 @@ export default function AdminLayout({ loaderData }: Route.ComponentProps) {
             <Link to="/admin/email-transports">
               <MailIcon className="mr-2 h-5 w-5" />
               <Trans>Email Transports</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn('justify-start md:w-full', pathname?.startsWith('/admin/email-jobs') && 'bg-secondary')}
+            asChild
+          >
+            <Link to="/admin/email-jobs">
+              <MailCheckIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Jobs</Trans>
             </Link>
           </Button>
 

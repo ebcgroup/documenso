@@ -61,12 +61,15 @@ export const findEmailJobsRoute = adminProcedure
       }),
     ]);
 
-    const dataWithRetryState = data.map((job) => ({
-      ...job,
-      canRetry:
-        job.status === BackgroundJobStatus.FAILED ||
-        (job.status === BackgroundJobStatus.PENDING && job.submittedAt <= stalePendingCutoff),
-    }));
+    const dataWithRetryState = data.map((job) => {
+      return {
+        ...job,
+        payload: job.payload as Prisma.JsonValue,
+        canRetry:
+          job.status === BackgroundJobStatus.FAILED ||
+          (job.status === BackgroundJobStatus.PENDING && job.submittedAt <= stalePendingCutoff),
+      };
+    });
 
     return {
       data: dataWithRetryState,

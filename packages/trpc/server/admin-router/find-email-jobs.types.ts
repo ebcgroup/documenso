@@ -25,6 +25,7 @@ export const ZFindEmailJobsResponseSchema = ZFindResultResponse.extend({
   })
     .extend({
       canRetry: z.boolean(),
+      statusDetail: z.string().nullable(),
     })
     .array(),
 });

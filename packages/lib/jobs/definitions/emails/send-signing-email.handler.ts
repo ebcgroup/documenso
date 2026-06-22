@@ -9,6 +9,7 @@ import {
   OrganisationType,
   RecipientRole,
   SendStatus,
+  Prisma,
 } from '@prisma/client';
 import { createElement } from 'react';
 
@@ -25,7 +26,7 @@ import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
 import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import type { JobRunIO } from '../../client/_internal/job';
+import { NonRetryableJobError, type JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningEmailJobDefinition } from './send-signing-email';
 
 export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefinition; io: JobRunIO }) => {
@@ -73,7 +74,15 @@ export const run = async ({ payload, io }: { payload: TSendSigningEmailJobDefini
         id: recipientId,
       },
     }),
-  ]);
+  ]).catch((error: unknown) => {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+      throw new NonRetryableJobError(
+        `Signing email target no longer exists for document ${documentId} and recipient ${recipientId}`,
+      );
+    }
+
+    throw error;
+  });
 
   const { documentMeta, team } = envelope;
 

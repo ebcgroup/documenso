@@ -1,5 +1,6 @@
 import { router } from '../trpc';
 import { addUserToOrganisationRoute } from './add-user-to-organisation';
+import { cancelEmailJobRoute } from './cancel-email-job';
 import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
@@ -32,6 +33,7 @@ import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getAdminTeamRoute } from './get-admin-team';
 import { getEmailDomainRoute } from './get-email-domain';
+import { getEmailJobRoute } from './get-email-job';
 import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { reregisterEmailDomainRoute } from './reregister-email-domain';
@@ -113,7 +115,9 @@ export const adminRouter = router({
   },
   emailJob: {
     find: findEmailJobsRoute,
+    get: getEmailJobRoute,
     retry: retryEmailJobRoute,
+    cancel: cancelEmailJobRoute,
   },
   emailTransport: {
     find: findEmailTransportsRoute,

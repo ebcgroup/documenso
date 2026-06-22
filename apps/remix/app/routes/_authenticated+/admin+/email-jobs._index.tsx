@@ -9,35 +9,24 @@ import { DataTablePagination } from '@documenso/ui/primitives/data-table-paginat
 import { Input } from '@documenso/ui/primitives/input';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { RefreshCcwIcon } from 'lucide-react';
+import { EyeIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 const EMAIL_JOB_STATUSES = ['PENDING', 'PROCESSING', 'FAILED', 'COMPLETED'] as const;
 
-const payloadSummary = (payload: unknown) => {
-  if (!payload || typeof payload !== 'object') {
-    return '-';
-  }
-
-  const entries = Object.entries(payload).slice(0, 4);
-
-  if (entries.length === 0) {
-    return '{}';
-  }
-
-  return entries
-    .map(([key, value]) => `${key}: ${typeof value === 'string' || typeof value === 'number' ? value : '[...]'}`)
-    .join(', ');
-};
+const EMAIL_JOB_STATUS_BADGE_VARIANTS = {
+  PENDING: 'secondary',
+  PROCESSING: 'orange',
+  FAILED: 'destructive',
+  COMPLETED: 'default',
+} as const;
 
 export default function AdminEmailJobsPage() {
   const { _, i18n } = useLingui();
-  const { toast } = useToast();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
@@ -71,7 +60,6 @@ export default function AdminEmailJobsPage() {
     data: findEmailJobsData,
     isPending: isLoading,
     isLoadingError,
-    refetch,
   } = trpc.admin.emailJob.find.useQuery(
     {
       page: page || 1,
@@ -83,22 +71,6 @@ export default function AdminEmailJobsPage() {
       placeholderData: (previousData) => previousData,
     },
   );
-
-  const { mutateAsync: retryEmailJob, isPending: isRetrying } = trpc.admin.emailJob.retry.useMutation({
-    onSuccess: () => {
-      toast({
-        title: _(msg`Email job retry queued`),
-        variant: 'default',
-      });
-      void refetch();
-    },
-    onError: () => {
-      toast({
-        title: _(msg`Failed to retry email job`),
-        variant: 'destructive',
-      });
-    },
-  });
 
   const results = findEmailJobsData ?? {
     data: [],
@@ -124,9 +96,19 @@ export default function AdminEmailJobsPage() {
         header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }) => {
-          const statusVariant = row.original.status === 'FAILED' ? 'destructive' : 'secondary';
+          const statusVariant = EMAIL_JOB_STATUS_BADGE_VARIANTS[row.original.status];
 
-          return <Badge variant={statusVariant}>{row.original.status}</Badge>;
+          return (
+            <div>
+              <Badge variant={statusVariant} title={row.original.statusDetail ?? undefined}>
+                {row.original.status}
+              </Badge>
+
+              {row.original.statusDetail && (
+                <div className="mt-1 max-w-[12rem] text-muted-foreground text-xs">{row.original.statusDetail}</div>
+              )}
+            </div>
+          );
         },
       },
       {
@@ -144,20 +126,6 @@ export default function AdminEmailJobsPage() {
           }),
       },
       {
-        header: _(msg`Last Retry`),
-        accessorKey: 'lastRetriedAt',
-        cell: ({ row }) => {
-          if (!row.original.lastRetriedAt) {
-            return <span className="text-muted-foreground">-</span>;
-          }
-
-          return i18n.date(row.original.lastRetriedAt, {
-            dateStyle: 'medium',
-            timeStyle: 'short',
-          });
-        },
-      },
-      {
         header: _(msg`Completed`),
         accessorKey: 'completedAt',
         cell: ({ row }) => {
@@ -172,31 +140,19 @@ export default function AdminEmailJobsPage() {
         },
       },
       {
-        header: _(msg`Payload`),
-        accessorKey: 'payload',
-        cell: ({ row }) => (
-          <code className="block max-w-[16rem] truncate rounded bg-muted px-2 py-1 text-xs">
-            {payloadSummary(row.original.payload)}
-          </code>
-        ),
-      },
-      {
-        header: _(msg`Actions`),
+        header: _(msg`Details`),
         id: 'actions',
         cell: ({ row }) => (
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={!row.original.canRetry || isRetrying}
-            onClick={() => void retryEmailJob({ id: row.original.id })}
-          >
-            <RefreshCcwIcon className="mr-2 h-4 w-4" />
-            <Trans>Retry</Trans>
+          <Button variant="outline" size="sm" asChild>
+            <Link to={`/admin/email-jobs/${row.original.id}`}>
+              <EyeIcon className="mr-2 h-4 w-4" />
+              <Trans>View</Trans>
+            </Link>
           </Button>
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, [_, i18n, isRetrying, retryEmailJob]);
+  }, [_, i18n]);
 
   const onPaginationChange = (newPage: number, newPerPage: number) => {
     updateSearchParams({
@@ -283,12 +239,6 @@ export default function AdminEmailJobsPage() {
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-4 w-24 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-24 rounded-full" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-32 rounded-full" />
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-8 w-20 rounded-md" />

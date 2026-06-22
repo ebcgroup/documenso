@@ -93,43 +93,59 @@ Expected result: the first command finds the no-op export; the second command fi
 matches; the third returns `False`. If upstream adds a direct `@react-email/preview`
 import, switch it back to the shared `../components` export.
 
-### Admin Email Job Visibility
+### Admin Email Job Visibility And Local Job Recovery
 
-Adds a small admin-only view for email-related `BackgroundJob` rows. It lists status,
-retry counts, timestamps, and payload summaries, and lets admins requeue failed or stale
-pending email jobs. This does not change upstream email send behavior, add infinite
-retries, add backup transports, or add a new email delivery table.
+Adds an admin-only email jobs view backed by existing `BackgroundJob` rows. The list page
+stays compact; the detail page shows payload, resolved user/recipient/document context,
+job tasks, retry, and a manual stop action. This does not add infinite retries, backup
+transports, or a new email delivery table.
 
-Important files:
+Upstream files intentionally modified:
 
 - `apps/remix/app/routes/_authenticated+/admin+/_layout.tsx`
-- `apps/remix/app/routes/_authenticated+/admin+/email-jobs._index.tsx`
-- `packages/trpc/server/admin-router/email-jobs.ts`
-- `packages/trpc/server/admin-router/find-email-jobs.ts`
-- `packages/trpc/server/admin-router/find-email-jobs.types.ts`
-- `packages/trpc/server/admin-router/retry-email-job.ts`
-- `packages/trpc/server/admin-router/retry-email-job.types.ts`
+- `packages/lib/jobs/client/_internal/job.ts`
+- `packages/lib/jobs/client/bullmq.ts`
+- `packages/lib/jobs/client/local.ts`
+- `packages/lib/jobs/definitions/emails/send-signing-email.handler.ts`
 - `packages/trpc/server/admin-router/router.ts`
+
+Fork-owned dashboard files:
+
+- `apps/remix/app/routes/_authenticated+/admin+/email-jobs._index.tsx`
+- `apps/remix/app/routes/_authenticated+/admin+/email-jobs.$id.tsx`
+- `packages/trpc/server/admin-router/*email-job*`
 - `packages/app-tests/e2e/admin/email-jobs.spec.ts`
 
 Expected behavior:
 
 - Admin sidebar includes `Email Jobs`.
-- `/admin/email-jobs` filters email jobs by status and search query.
-- Retry queues a fresh job from the original job id and payload only for failed or stale
-  pending jobs.
+- `/admin/email-jobs` filters email jobs by status and search query, sorted by newest
+  `submittedAt`.
+- Completed status is green, pending is blue, processing is orange, and failed is red.
+- Failed jobs can be retried by creating a new background job.
+- Stale pending local jobs can be retried by resubmitting the original background job row.
+- Pending email jobs can be stopped manually; this marks the job `FAILED` and records an
+  `Admin cancellation` task so the detail page explains why it is failed.
+- The local jobs provider no longer depends on fire-and-forget internal HTTP for normal
+  local execution. It creates the `BackgroundJob` row, queues it in-process, atomically
+  claims `PENDING -> PROCESSING`, and marks terminal failures.
+- On startup and each poll, the local jobs provider recovers registered pending jobs
+  submitted within the last day only. Older pending jobs remain visible for manual action.
+- Deleted signing targets throw `NonRetryableJobError`, so obsolete signing email jobs
+  fail terminally instead of retrying forever.
 
 Checks after upstream merges:
 
 ```powershell
-rg -n "emailJob|Email Jobs" packages/trpc/server/admin-router apps/remix/app/routes/_authenticated+/admin+
-rg -n "send.signing.requested.email|send.admin.user.created.email" packages/trpc/server/admin-router/email-jobs.ts
+rg -n "emailJob|Email Jobs|Stop Job" packages/trpc/server/admin-router apps/remix/app/routes/_authenticated+/admin+
+rg -n "processPendingJobs|PENDING_JOB_RECOVERY_AGE_MS|queueJobProcessing" packages/lib/jobs/client/local.ts
+rg -n "NonRetryableJobError" packages/lib/jobs/client packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 rg -n "\[ADMIN\]\[EMAIL_JOBS\]" packages/app-tests/e2e/admin/email-jobs.spec.ts
 ```
 
-If upstream adds an equivalent general jobs dashboard or email delivery overview, prefer
-upstream and remove this fork implementation unless the upstream feature lacks the
-self-hosted retry visibility needed here.
+If upstream adds an equivalent general jobs dashboard, email delivery overview, or local
+job recovery fix, prefer upstream and remove this fork implementation unless upstream
+lacks the self-hosted visibility and manual recovery needed here.
 
 ### PDF Timestamp Authorities
 

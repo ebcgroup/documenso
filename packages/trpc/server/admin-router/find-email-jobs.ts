@@ -3,7 +3,12 @@ import { prisma } from '@documenso/prisma';
 import { BackgroundJobStatus, Prisma } from '@prisma/client';
 
 import { adminProcedure } from '../trpc';
-import { EMAIL_JOB_IDS, STALE_PENDING_EMAIL_JOB_AGE_MS } from './email-jobs';
+import {
+  EMAIL_JOB_IDS,
+  getEmailJobAdminCancellation,
+  getEmailJobStatusDetail,
+  STALE_PENDING_EMAIL_JOB_AGE_MS,
+} from './email-jobs';
 import { ZFindEmailJobsRequestSchema, ZFindEmailJobsResponseSchema } from './find-email-jobs.types';
 
 export const findEmailJobsRoute = adminProcedure
@@ -52,24 +57,43 @@ export const findEmailJobsRoute = adminProcedure
         where: whereClause,
         skip: Math.max(page - 1, 0) * perPage,
         take: perPage,
-        orderBy: {
-          submittedAt: 'desc',
-        },
+        orderBy: [
+          {
+            submittedAt: 'desc',
+          },
+          {
+            id: 'desc',
+          },
+        ],
       }),
       prisma.backgroundJob.count({
         where: whereClause,
       }),
     ]);
 
-    const dataWithRetryState = data.map((job) => {
-      return {
-        ...job,
-        payload: job.payload as Prisma.JsonValue,
-        canRetry:
-          job.status === BackgroundJobStatus.FAILED ||
-          (job.status === BackgroundJobStatus.PENDING && job.submittedAt <= stalePendingCutoff),
-      };
-    });
+    const dataWithRetryState = await Promise.all(
+      data.map(async (job) => {
+        const payload = job.payload as Prisma.JsonValue | null;
+        const cancellation = await getEmailJobAdminCancellation(job.id);
+
+        return {
+          ...job,
+          payload,
+          canRetry:
+            !cancellation &&
+            (job.status === BackgroundJobStatus.FAILED ||
+              (job.status === BackgroundJobStatus.PENDING && job.submittedAt <= stalePendingCutoff)),
+          statusDetail: await getEmailJobStatusDetail(
+            {
+              id: job.id,
+              jobId: job.jobId,
+              payload,
+            },
+            cancellation,
+          ),
+        };
+      }),
+    );
 
     return {
       data: dataWithRetryState,

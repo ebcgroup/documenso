@@ -14,7 +14,12 @@ import { Hono } from 'hono';
 import IORedis from 'ioredis';
 
 import { env } from '../../utils/env';
-import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
+import {
+  NonRetryableJobError,
+  type JobDefinition,
+  type JobRunIO,
+  type SimpleTriggerJobOptions,
+} from './_internal/job';
 import type { Json } from './_internal/json';
 import { BaseJobProvider } from './base';
 
@@ -284,8 +289,11 @@ export class BullMQJobProvider extends BaseJobProvider {
           .catch(() => null);
       }
     } catch (error) {
+      const isNonRetryableError = error instanceof NonRetryableJobError;
+
       if (backgroundJobId) {
-        const isFinalAttempt = job.attemptsMade >= (job.opts.attempts ?? DEFAULT_MAX_RETRIES) - 1;
+        const isFinalAttempt =
+          isNonRetryableError || job.attemptsMade >= (job.opts.attempts ?? DEFAULT_MAX_RETRIES) - 1;
 
         await prisma.backgroundJob
           .update({
@@ -296,6 +304,10 @@ export class BullMQJobProvider extends BaseJobProvider {
             },
           })
           .catch(() => null);
+      }
+
+      if (isNonRetryableError) {
+        return;
       }
 
       throw error;

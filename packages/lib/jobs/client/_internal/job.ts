@@ -59,4 +59,11 @@ export interface JobRunIO {
   };
 }
 
+export class NonRetryableJobError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'NonRetryableJobError';
+  }
+}
+
 export const defineJob = <N extends string, T = unknown>(job: JobDefinition<N, T>): JobDefinition<N, T> => job;

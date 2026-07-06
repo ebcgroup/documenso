@@ -39,9 +39,9 @@ import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
 import { AdminOrganisationDeleteDialog } from '~/components/dialogs/admin-organisation-delete-dialog';
+import { AdminOrganisationMemberCreateDialog } from '~/components/dialogs/admin-organisation-member-create-dialog';
 import { AdminOrganisationMemberDeleteDialog } from '~/components/dialogs/admin-organisation-member-delete-dialog';
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
-import { AdminOrganisationMemberCreateDialog } from '~/components/dialogs/admin-organisation-member-create-dialog';
 import { AdminOrganisationSyncSubscriptionDialog } from '~/components/dialogs/admin-organisation-sync-subscription-dialog';
 import { DetailsCard, DetailsValue } from '~/components/general/admin-details';
 import { AdminGlobalSettingsSection } from '~/components/general/admin-global-settings-section';
@@ -408,7 +408,7 @@ export default function OrganisationGroupSettingsPage({ params, loaderData }: Ro
       <div className="mt-16 space-y-10">
         <div>
           <div className="flex items-center justify-between">
-            <label className="text-sm font-medium leading-none">
+            <label className="font-medium text-sm leading-none">
               <Trans>Organisation Members</Trans>
             </label>
 

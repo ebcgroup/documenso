@@ -4,24 +4,26 @@ This file tracks intentional EBC fork behavior that still differs from upstream 
 After every upstream merge, update this file so future merges can prefer upstream while
 preserving only the fork fixes or additions that upstream still does not cover.
 
-Last reconciled with upstream: `upstream/main` at Documenso v2.13.0.
+Last reconciled with upstream release tag: `v2.14.0`.
 
 ## Merge Workflow
 
 Use this workflow whenever pulling a new upstream Documenso release into the fork.
 
-1. Start clean and fetch upstream.
+1. Start clean, choose the target release tag, and fetch upstream tags.
 
 ```powershell
 git status --short
-git fetch upstream
+$releaseTag = "v2.14.0" # Replace with the release being imported.
+git fetch upstream --tags
 ```
 
-2. Merge upstream into the fork branch.
+2. Merge the release tag into the fork branch. Do not merge `upstream/main`; the fork
+   tracks published releases so unreleased changes are not deployed accidentally.
 
 ```powershell
 git switch main
-git merge upstream/main
+git merge $releaseTag
 ```
 
 3. For every conflict, prefer upstream structure first, then reapply the smallest EBC
@@ -45,8 +47,8 @@ Conflict rules:
 5. Review the fork delta against upstream before committing.
 
 ```powershell
-git diff --stat upstream/main main
-git diff --name-status upstream/main main
+git diff --stat $releaseTag main
+git diff --name-status $releaseTag main
 ```
 
 Expected result: the diff should mostly match the files listed under `Active Fork Changes`.
@@ -54,7 +56,7 @@ Anything else needs a reason in this file or should be removed.
 
 6. Update this file before committing.
 
-- Update `Last reconciled with upstream`.
+- Update `Last reconciled with upstream release tag`.
 - Move fixed items from `Active Fork Changes` to `Upstream-Resolved Items`.
 - Add any new local fixes with checks that can be run after the next merge.
 
@@ -69,6 +71,7 @@ of editing every template, and removes the unused email preview app.
 Important files:
 
 - `packages/email/components.ts`
+- `packages/email/package.json`
 - `packages/email/preview/`
 
 Expected behavior:
@@ -80,6 +83,8 @@ Expected behavior:
   `@react-email/preview`.
 - `packages/email/preview/` should stay absent unless we intentionally reintroduce local
   email preview tooling.
+- Upstream v2.14.0 introduced a first-party `packages/email/preview/` app. This fork
+  intentionally omits it while the shared `Preview` export remains disabled.
 
 Checks after upstream merges:
 

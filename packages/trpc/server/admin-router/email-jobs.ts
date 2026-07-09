@@ -1,7 +1,7 @@
 import { ONE_MINUTE } from '@documenso/lib/constants/time';
 import { unsafeBuildEnvelopeIdQuery } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import { BackgroundJobTaskStatus, DocumentStatus, EnvelopeType, Prisma } from '@prisma/client';
+import { BackgroundJobTaskStatus, DocumentStatus, EnvelopeType, type Prisma } from '@prisma/client';
 
 export const EMAIL_JOB_IDS = [
   'send.admin.user.created.email',
@@ -9,11 +9,14 @@ export const EMAIL_JOB_IDS = [
   'send.document.cancelled.emails',
   'send.document.completed.emails',
   'send.document.created.from.direct.template.email',
+  'send.document.deleted.emails',
+  'send.document.pending.email',
   'send.organisation-limit-alert.email',
   'send.organisation-member-joined.email',
   'send.organisation-member-left.email',
   'send.owner.recipient.expired.email',
   'send.password.reset.success.email',
+  'send.recipient.removed.email',
   'send.recipient.signed.email',
   'send.signing.rejected.emails',
   'send.signing.requested.email',
@@ -85,10 +88,7 @@ export const getEmailJobAdminCancellation = async (backgroundJobId: string) => {
   return getEmailJobAdminCancellationFromResult(task?.result as Prisma.JsonValue | null);
 };
 
-export const getEmailJobTargetSummary = async (job: {
-  jobId: string;
-  payload: Prisma.JsonValue | null;
-}) => {
+export const getEmailJobTargetSummary = async (job: { jobId: string; payload: Prisma.JsonValue | null }) => {
   const userId = getPayloadNumber(job.payload, 'userId');
   const documentId = getPayloadNumber(job.payload, 'documentId');
   const recipientId = getPayloadNumber(job.payload, 'recipientId');

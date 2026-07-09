@@ -7,6 +7,57 @@ import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
+test('[ADMIN][EMAIL_JOBS]: admin can view email jobs migrated upstream in v2.14', async ({ page }) => {
+  const { user: adminUser } = await seedUser({
+    isAdmin: true,
+  });
+
+  const batchId = `test-v214-email-jobs-${Date.now()}`;
+  const migratedEmailJobs = [
+    {
+      jobId: 'send.document.deleted.emails',
+      name: 'Send Document Deleted Emails',
+    },
+    {
+      jobId: 'send.document.pending.email',
+      name: 'Send Document Pending Email',
+    },
+    {
+      jobId: 'send.recipient.removed.email',
+      name: 'Send Recipient Removed Email',
+    },
+  ];
+
+  const failedJobs = await Promise.all(
+    migratedEmailJobs.map((job, index) =>
+      prisma.backgroundJob.create({
+        data: {
+          id: `${batchId}-${index}`,
+          jobId: job.jobId,
+          name: job.name,
+          version: '1.0.0',
+          status: BackgroundJobStatus.FAILED,
+          payload: {},
+          completedAt: new Date(),
+        },
+      }),
+    ),
+  );
+
+  await apiSignin({
+    page,
+    email: adminUser.email,
+    redirectPath: `/admin/email-jobs?status=FAILED&query=${batchId}`,
+  });
+
+  await expect(page.getByRole('heading', { name: 'Email Jobs' })).toBeVisible();
+
+  for (const failedJob of failedJobs) {
+    await expect(page.getByText(failedJob.name)).toBeVisible();
+    await expect(page.getByText(failedJob.id)).toBeVisible();
+  }
+});
+
 test('[ADMIN][EMAIL_JOBS]: admin can view and retry failed email jobs', async ({ page }) => {
   const { user: adminUser } = await seedUser({
     isAdmin: true,

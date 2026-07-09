@@ -126,6 +126,8 @@ Expected behavior:
 - Admin sidebar includes `Email Jobs`.
 - `/admin/email-jobs` filters email jobs by status and search query, sorted by newest
   `submittedAt`.
+- The dashboard includes upstream v2.14 email jobs for deleted documents, pending
+  documents, and removed recipients.
 - Completed status is green, pending is blue, processing is orange, and failed is red.
 - Failed jobs can be retried by creating a new background job.
 - Stale pending local jobs can be retried by resubmitting the original background job row.
@@ -143,6 +145,7 @@ Checks after upstream merges:
 
 ```powershell
 rg -n "emailJob|Email Jobs|Stop Job" packages/trpc/server/admin-router apps/remix/app/routes/_authenticated+/admin+
+rg -n "send.document.deleted.emails|send.document.pending.email|send.recipient.removed.email" packages/trpc/server/admin-router/email-jobs.ts
 rg -n "processPendingJobs|PENDING_JOB_RECOVERY_AGE_MS|queueJobProcessing" packages/lib/jobs/client/local.ts
 rg -n "NonRetryableJobError" packages/lib/jobs/client packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 rg -n "\[ADMIN\]\[EMAIL_JOBS\]" packages/app-tests/e2e/admin/email-jobs.spec.ts
